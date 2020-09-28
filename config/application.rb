@@ -36,5 +36,6 @@ module Dbank
 
     config.web_console.permissions = '0.0.0.0/0'
     config.web_console.template_paths = 'app/views/web_console'
+    config.web_console.development_only = false
   end
 end
