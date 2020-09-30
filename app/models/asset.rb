@@ -25,6 +25,14 @@ class Asset
     liabilities_value.value.to_f
   end
 
+  def cov
+    if liabilities.zero?
+      0.0
+    else
+      cash / liabilities
+    end
+  end
+
   def deposit(amount)
     # TODO: Mint LP Token
 

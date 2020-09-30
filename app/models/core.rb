@@ -18,14 +18,25 @@ class Core
       fa = Asset.find(from)
       ta = Asset.find(to)
 
-      # TODO: Price Oracle
-      price = 1
+      price = Oracle.price(from, to)
 
-      ta.debit(amount * price)
+      received = amount * price
+      ta.debit(received)
       fa.credit(amount)
 
       # TODO: Transfer to account
-      true
+
+      received
+    end
+
+    def slippage_curve(x)
+      p1 = 3
+      p2 = 200
+      if x.zero?
+        0.0
+      else
+        1 + 1 / (p2**(x**p1) - 1)
+      end
     end
 
     def pp
