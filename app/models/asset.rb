@@ -47,6 +47,16 @@ class Asset
     self
   end
 
+  def credit(amount)
+    self.cash_value = cash + amount
+  end
+
+  def debit(amount)
+    raise NotEnoughCash if cash < amount
+
+    self.cash_value = cash - amount
+  end
+
   def self.create(token_id)
     new.tap do |a|
       a.id = token_id

@@ -609,7 +609,10 @@ REPLConsole.prototype.renderInput = function() {
 REPLConsole.prototype.writeOutput = function(output) {
   var consoleMessage = document.createElement('pre');
   consoleMessage.className = "console-message";
-  consoleMessage.innerHTML = escapeHTML(output);
+  var content = escapeHTML(output)
+  console.log(content)
+  content = content.replaceAll("\\n", "<br />")
+  consoleMessage.innerHTML = content;
   this.inner.appendChild(consoleMessage);
   this.newPromptBox();
   return consoleMessage;
