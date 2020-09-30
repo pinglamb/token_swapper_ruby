@@ -32,6 +32,8 @@ gem 'bootsnap', '>= 1.4.2', require: false
 
 # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
 gem 'awesome_print'
+gem 'connection_pool'
+gem 'redis-objects'
 gem 'web-console', '>= 3.3.0'
 
 group :development, :test do
