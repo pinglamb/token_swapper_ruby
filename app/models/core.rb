@@ -20,8 +20,8 @@ class Core
       fa = Asset.find(from)
       ta = Asset.find(to)
 
-      message += "From: #{from}(cash: #{fa.cash}, liabilities: #{fa.liabilities})\n"
-      message += "To: #{to}(cash: #{ta.cash}, liabilities: #{ta.liabilities})\n"
+      message += "From: #{fa.pp}\n"
+      message += "To: #{ta.pp}\n"
       message += "From Amount: #{amount}\n"
 
       price = Oracle.price(from, to)
@@ -61,8 +61,25 @@ class Core
       message += "Adjusted Price: #{adjusted_price}\n"
       message += "Adjusted To Amount: #{adjusted_to_amount}\n"
 
-      ta.debit(adjusted_to_amount)
-      fa.credit(amount)
+      ff = from_amount * sft / 2
+      tf = to_amount * sft / 2
+
+      message += "==============================\n"
+      message += "From Fee (#{fa.sym}): #{ff}\n"
+      message += "To Fee (#{ta.sym}): #{tf}\n"
+
+      final_from_amount = from_amount - ff
+      final_to_amount = adjusted_to_amount - tf
+
+      ta.debit(final_to_amount)
+      fa.credit(final_from_amount)
+
+      fa.fee(ff)
+      ta.fee(tf)
+
+      message += "======== After Swap ==========\n"
+      message += "From: #{fa.pp}\n"
+      message += "To: #{ta.pp}\n"
 
       # TODO: Transfer to account
 
@@ -89,7 +106,7 @@ class Core
 
       message += "============== Assets ==============\n"
       Core.pool.assets.each do |asset|
-        message += "#{asset.token_id.value}(cash: #{asset.cash}, liabilities: #{asset.liabilities}, coverage: #{asset.cov})"
+        message += asset.pp
         message += "\n"
       end
 
