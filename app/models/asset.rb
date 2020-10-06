@@ -23,15 +23,15 @@ class Asset
   end
 
   def cash
-    cash_value.value.to_f
+    cash_value.value.to_d
   end
 
   def liabilities
-    liabilities_value.value.to_f
+    liabilities_value.value.to_d
   end
 
   def dividend
-    dividend_value.value.to_f
+    dividend_value.value.to_d
   end
 
   def cov
@@ -74,7 +74,7 @@ class Asset
     self.cash_value = cash - amount
   end
 
-  def fee(amount)
+  def add_dividend(amount)
     self.dividend_value = dividend + amount
   end
 

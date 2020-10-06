@@ -22,7 +22,6 @@ class Core
 
       message += "From: #{fa.pp}\n"
       message += "To: #{ta.pp}\n"
-      message += "From Amount: #{amount}\n"
 
       price = Oracle.price(from, to)
       from_amount = amount
@@ -30,9 +29,8 @@ class Core
 
       message += "==============================\n"
       message += "Oracle Price: #{price}\n"
-      message += "To Amount: #{to_amount}\n"
-
-      raise Asset::NotEnoughCash if ta.cash < to_amount
+      message += "Ideal Δfrom:  #{from_amount}\n"
+      message += "Ideal Δto:    #{to_amount}\n"
 
       from_before_cov = fa.cash / fa.liabilities
       to_before_cov = ta.cash / ta.liabilities
@@ -40,42 +38,46 @@ class Core
       to_after_cov = (ta.cash - to_amount) / ta.liabilities
 
       message += "==============================\n"
-      message += "From Cov (Before): #{from_before_cov}\n"
-      message += "From Cov (After): #{from_after_cov}\n"
-      message += "To Cov (Before): #{to_before_cov}\n"
-      message += "To Cov (After): #{to_after_cov}\n"
+      message += "from-r: #{from_before_cov}\n"
+      message += "from-r': #{from_after_cov}\n"
+      message += "to-r: #{to_before_cov}\n"
+      message += "to-r': #{to_after_cov}\n"
 
-      from_s = (s(from_after_cov) - s(from_before_cov)) / (from_after_cov - from_before_cov)
-      to_s = (s(to_after_cov) - s(to_before_cov)) / (to_after_cov - to_before_cov)
+      from_slippage = (s(from_after_cov) - s(from_before_cov)) / (from_after_cov - from_before_cov)
+      to_slippage = (s(to_after_cov) - s(to_before_cov)) / (to_after_cov - to_before_cov)
+      sft = to_slippage - from_slippage
 
-      sft = to_s - from_s
+      message += "from-f(r): #{s(from_before_cov)}\n"
+      message += "from-f(r'): #{s(from_after_cov)}\n"
+      message += "from-slippage: #{from_slippage * 100}%\n"
+      message += "to-f(r): #{s(to_before_cov)}\n"
+      message += "to-f(r'): #{s(to_after_cov)}\n"
+      message += "to-slippage: #{to_slippage * 100}%\n"
+      message += "swapping slippage: #{sft * 100}%\n"
 
-      message += "Si: #{from_s}\n"
-      message += "Sj: #{to_s}\n"
-      message += "Sj - Si: #{sft}\n"
+      haircut_percent = '0.001'.to_d
+      retention_percent = '0.2'.to_d
+      haircut = to_amount * haircut_percent
+      retention = haircut * retention_percent
+      dividend = haircut - retention
+
+      message += "==============================\n"
+      message += "haircut %: #{haircut_percent * 100}\n"
+      message += "haircut (#{ta.sym}): #{haircut}\n"
+      message += "retention (#{ta.sym}): #{retention}\n"
+      message += "dividend (#{ta.sym}): #{dividend}\n"
 
       adjusted_price = price * (1 + sft)
       adjusted_to_amount = amount * adjusted_price
+      user_to_amount = adjusted_to_amount - haircut
 
       message += "==============================\n"
-      message += "Adjusted Price: #{adjusted_price}\n"
-      message += "Adjusted To Amount: #{adjusted_to_amount}\n"
+      message += "Actual Δfrom:  #{from_amount}\n"
+      message += "Actual Δto:    #{user_to_amount}\n"
 
-      ff = from_amount * sft / 2
-      tf = to_amount * sft / 2
-
-      message += "==============================\n"
-      message += "From Fee (#{fa.sym}): #{ff}\n"
-      message += "To Fee (#{ta.sym}): #{tf}\n"
-
-      final_from_amount = from_amount - ff
-      final_to_amount = adjusted_to_amount - tf
-
-      ta.debit(final_to_amount)
-      fa.credit(final_from_amount)
-
-      fa.fee(ff)
-      ta.fee(tf)
+      ta.debit(adjusted_to_amount - retention)
+      fa.credit(from_amount)
+      ta.add_dividend(dividend)
 
       message += "======== After Swap ==========\n"
       message += "From: #{fa.pp}\n"
@@ -87,8 +89,8 @@ class Core
     end
 
     def s(x)
-      a = 0.3
-      b = 0.9
+      a = 0.4
+      b = 1.0
 
       if x >= 0 && a > x
         -x + (a + b) / 2
