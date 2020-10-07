@@ -56,7 +56,11 @@ class Asset
 
   def deposit(from, amount)
     token.transfer(from, address, amount.to_d)
-    lp_token.mint(from, amount.to_d * lp_token.total_supply / liabilities)
+    if liabilities == 0
+      lp_token.mint(from, amount.to_d)
+    else
+      lp_token.mint(from, amount.to_d * lp_token.total_supply / liabilities)
+    end
 
     self.cash_value = cash + amount
     self.liabilities_value = liabilities + amount

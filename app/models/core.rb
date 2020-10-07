@@ -32,7 +32,7 @@ class Core
       Asset.create('USDT')
     end
 
-    def swap(from, to, amount)
+    def swap(address, from, to, amount)
       message = "\n"
 
       fa = Asset.find(from)
@@ -102,7 +102,9 @@ class Core
       message += "From: #{fa.pp}\n"
       message += "To: #{ta.pp}\n"
 
-      # TODO: Transfer to account
+      # Token Transfer
+      fa.token.transfer address, fa.address, from_amount
+      ta.token.transfer ta.address, address, user_to_amount
 
       message
     end
