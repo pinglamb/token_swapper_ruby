@@ -73,9 +73,12 @@ class Core
       message += "to-slippage: #{to_slippage * 100}%\n"
       message += "swapping slippage: #{sft * 100}%\n"
 
+      adjusted_price = price * (1 + sft)
+      adjusted_to_amount = amount * adjusted_price
+
       haircut_percent = '0.001'.to_d
       retention_percent = '0.2'.to_d
-      haircut = to_amount * haircut_percent
+      haircut = adjusted_to_amount * haircut_percent
       retention = haircut * retention_percent
       dividend = haircut - retention
 
@@ -85,16 +88,14 @@ class Core
       message += "retention (#{ta.sym}): #{retention}\n"
       message += "dividend (#{ta.sym}): #{dividend}\n"
 
-      adjusted_price = price * (1 + sft)
-      adjusted_to_amount = amount * adjusted_price
       user_to_amount = adjusted_to_amount - haircut
 
       message += "==============================\n"
       message += "Actual Δfrom:  #{from_amount}\n"
       message += "Actual Δto:    #{user_to_amount}\n"
 
-      ta.debit(adjusted_to_amount - retention)
-      fa.credit(from_amount)
+      ta.deduct_cash(user_to_amount)
+      fa.add_cash(from_amount)
       ta.add_dividend(dividend)
 
       message += "======== After Swap ==========\n"

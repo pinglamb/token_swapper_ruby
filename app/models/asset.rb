@@ -55,9 +55,8 @@ class Asset
   end
 
   def deposit(from, amount)
-    token.transfer(from, address, amount)
-    # TODO: Proper LP minting with dividend handling
-    lp_token.mint(from, amount)
+    token.transfer(from, address, amount.to_d)
+    lp_token.mint(from, amount.to_d * lp_token.total_supply / liabilities)
 
     self.cash_value = cash + amount
     self.liabilities_value = liabilities + amount
@@ -78,17 +77,20 @@ class Asset
     self
   end
 
-  def credit(amount)
+  def add_cash(amount)
     self.cash_value = cash + amount
   end
 
-  def debit(amount)
+  def deduct_cash(amount)
     raise NotEnoughCash if cash < amount
 
     self.cash_value = cash - amount
   end
 
   def add_dividend(amount)
+    # Immediate distribution
+    self.liabilities_value = liabilities + amount
+
     self.dividend_value = dividend + amount
   end
 
