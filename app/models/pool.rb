@@ -13,10 +13,4 @@ class Pool
   def assets
     asset_ids.collect { |aid| Asset.find(aid) }
   end
-
-  def initialize
-    asset_ids << Asset.create('WETH').id unless asset_ids.include?('WETH')
-    asset_ids << Asset.create('USDC').id unless asset_ids.include?('USDC')
-    asset_ids << Asset.create('USDT').id unless asset_ids.include?('USDT')
-  end
 end

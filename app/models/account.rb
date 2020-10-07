@@ -42,4 +42,8 @@ class Account
   def self.find(id)
     new.tap { |a| a.id = id }
   end
+
+  def self.find_by_address(address)
+    Network.instance.accounts.find { |a| a.address == address }
+  end
 end

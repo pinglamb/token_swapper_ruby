@@ -26,6 +26,10 @@ class Core
           end
         end
       end
+
+      Asset.create('WETH')
+      Asset.create('USDC')
+      Asset.create('USDT')
     end
 
     def swap(from, to, amount)
