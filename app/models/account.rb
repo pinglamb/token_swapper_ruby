@@ -20,7 +20,7 @@ class Account
     message = "#{name} ("
     message += Network.instance.token_ids.each_with_object({}) do |tid, h|
       h[tid] = Token.find(tid).balance_of(address)
-    end.select { |_k, v| v > 0 }.collect { |k, v| "#{k}: #{v}" }.join(',')
+    end.select { |_k, v| v > 0 }.collect { |k, v| "#{k}: #{v}" }.join(', ')
 
     message += ')'
   end

@@ -36,6 +36,10 @@ class Token
     true
   end
 
+  def pp
+    "#{sym.value} (supply: #{total_supply})"
+  end
+
   def self.create(name:, sym:, initial_supply: 0)
     if Network.instance.token_ids.include?(sym)
       find(sym)

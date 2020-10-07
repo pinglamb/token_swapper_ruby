@@ -18,6 +18,14 @@ class Core
       Token.create(name: 'Wrapped ETH', sym: 'WETH', initial_supply: 1_000_000)
       Token.create(name: 'USD Coin', sym: 'USDC', initial_supply: 1_000_000)
       Token.create(name: 'Tether USD', sym: 'USDT', initial_supply: 1_000_000)
+
+      [Account.create('peter'), Account.create('mary')].each do |a|
+        Network.instance.tokens.each do |t|
+          if t.balance_of(a.address).zero?
+            t.transfer(t.address, a.address, 10_000)
+          end
+        end
+      end
     end
 
     def swap(from, to, amount)

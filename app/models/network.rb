@@ -22,4 +22,22 @@ class Network
       Token.find(tid)
     end
   end
+
+  def pp
+    message = "\n"
+
+    message += "============== Accounts ============\n"
+    accounts.each do |a|
+      message += a.pp
+      message += "\n"
+    end
+
+    message += "============== Tokens ==============\n"
+    tokens.each do |t|
+      message += t.pp
+      message += "\n"
+    end
+
+    message
+  end
 end
