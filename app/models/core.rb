@@ -14,6 +14,12 @@ class Core
       Redis::Objects.redis.flushall
     end
 
+    def seed
+      Token.create(name: 'Wrapped ETH', sym: 'WETH', initial_supply: 1_000_000)
+      Token.create(name: 'USD Coin', sym: 'USDC', initial_supply: 1_000_000)
+      Token.create(name: 'Tether USD', sym: 'USDT', initial_supply: 1_000_000)
+    end
+
     def swap(from, to, amount)
       message = "\n"
 

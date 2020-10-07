@@ -11,15 +11,9 @@ class Network
     1
   end
 
-  def initialize
-    unless token_ids.include?('WETH')
-      token_ids << Token.create(name: 'Wrapped ETH', sym: 'WETH').id
-    end
-    unless token_ids.include?('USDC')
-      token_ids << Token.create(name: 'USD Coin', sym: 'USDC').id
-    end
-    unless token_ids.include?('USDT')
-      token_ids << Token.create(name: 'Tether USD', sym: 'USDT').id
+  def accounts
+    account_ids.collect do |aid|
+      Account.find(aid)
     end
   end
 
